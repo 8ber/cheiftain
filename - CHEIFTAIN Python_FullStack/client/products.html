@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chieftain</title>
+<link rel="stylesheet" href="style.css">
+<script src="code.js"></script>
+</head> 
+<body id="gridContainer" onload="productsPageGenerate()">
+    <img src="CHIEFTAIN.svg" id="logo">
+<div id="header">
+<span><a href="products.html" class="menu">Products</a></span>
+<span><a href="customers.html" class="menu">Customers</a></span>
+<span><a href="purchases.html" class="menu">Purchases</a></span>
+<span><a href="login.html" class="menu" onclick="becomeAghost()">Log Out</a></span>
+</div>
+
+<div id="contentBox">
+<table id="mainTable"></table>
+</div>
+
+</body>
+<script>
+setTable(tdName1="Product Name", tdName2="Price", tdName3="Quantity", tdName4="Customers names", tdName5="Purchased date")
+</script>
+</html>

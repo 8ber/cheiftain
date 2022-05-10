@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chieftain</title>
+<link rel="stylesheet" href="style.css">
+<script src="code.js"></script>
+</head>
+<body id="gridContainer">
+    <img src="CHIEFTAIN.svg" id="logo">
+<div id="header">
+<span><a href="products.html" class="menu">Products</a></span>
+<span><a href="customers.html" class="menu">Customers</a></span>
+<span><a href="purchases.html" class="menu">Purchases</a></span>
+<span><a href="login.html" class="menu" onclick="becomeAghost()">Log Out</a></span>
+</div>
+<div id="EditContentBox">
+    <div id="editContent">
+        <h3>Edit customer</h3>
+        <label>First name:</label><input id="firstnameInput"><br>
+        <label>Last name:</label><input id="lastnameInput"><br>
+        <label>City:</label><input id="cityInput"><br><br>
+        <input id="closeButtonTxt" type="button" value="Edit" onclick="ManageCustomer(`edit`)">
+        <input id="submitButtonTxt" type="button" value="Delete"onclick="ManageCustomer(`del`)">
+        <br><span id="status"></span></div>
+        <div id="vl"><h4>Other purchased products:</h4></div>
+</div>
+
+
+</body>
+<script>
+editCustomer().then(data=>
+{
+document.getElementById("firstnameInput").value = data.firstname
+document.getElementById("lastnameInput").value = data.lastname
+document.getElementById("cityInput").value = data.city 
+})
+
+async function ManageCustomer(mode) 
+{
+    let obj =  { 
+            "customerID" : sessionStorage.getItem("customerID"),
+            "firstname" : document.getElementById("firstnameInput").value,
+            "lastname" : document.getElementById("lastnameInput").value,
+            "city" : document.getElementById("cityInput").value }
+
+    if (mode =="edit")
+    {
+        let token = localStorage.getItem("token");
+        let fetchParams = {  
+        method : "PUT",
+        body : JSON.stringify(obj),
+        headers : {"Content-type"  :"application/json",
+       "x-access-token" : token}
+        }
+        let response = await fetch("http://127.0.0.1:5000/edit_customer", fetchParams)
+        if (response.ok)
+        { 
+            let Data = await response.json();
+            if (Data) 
+            { document.getElementById("status").innerText = `updated successfully` }
+        }
+        else 
+        {   
+            document.getElementById("status").innerText = `${response.status} - ${response.statusText} - Error` 
+        }
+
+    }
+    else if (mode == "del")
+    {
+        let token = localStorage.getItem("token");
+        let fetchParams = 
+        {  
+        method : "DELETE",
+        body : JSON.stringify(obj),
+        headers : {"Content-type"  :"application/json",
+       "x-access-token" : token}
+        }
+        let response = await fetch("http://127.0.0.1:5000/del_customer/" + obj["customerID"], fetchParams)
+        if (response.ok)
+        { 
+            let Data = await response.json();
+            if (Data) 
+            { document.getElementById("status").innerText = `Deleted successfully` }
+        }
+        else 
+        {   
+            document.getElementById("status").innerText = `${response.status} - ${response.statusText} - Error` 
+        }
+}}
+
+search({customerID : sessionStorage.getItem("customerID")}).then(data=>{
+    let divElement = document.getElementById("vl")
+    data.forEach(prod=>
+    {
+        let productName = document.createElement("a")
+        divElement.appendChild(productName)
+        let brake = document.createElement("br")
+        divElement.appendChild(brake)
+        productName.innerText = `${prod.name}`
+        productName.href = "editProduct.html"
+        productName.onclick = () => { sessionStorage.setItem("productID", `${prod.productID}`)}
+    })
+})
+</script>
+</html>

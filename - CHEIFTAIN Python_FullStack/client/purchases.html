@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chieftain</title>
+<link rel="stylesheet" href="style.css">
+<script src="code.js"></script>
+</head>
+<body id="gridContainer">
+    <img src="CHIEFTAIN.svg" id="logo">
+<div id="header">
+<span><a href="products.html" class="menu">Products</a></span>
+<span><a href="customers.html" class="menu">Customers</a></span>
+<span><a href="purchases.html" class="menu">Purchases</a></span>
+<span><a href="login.html" class="menu" onclick="becomeAghost()">Log Out</a></span>
+</div>
+<div id="EditContentBox">
+    <div id="editContent">
+        <h4>Purchases</h4>
+    </div>
+    <div id="vl">
+        <p>
+            In this section you will find information regarding transactions, filtered by your choosing.
+            You can use all or some of the filters for a specific transaction, if none of the filters are used -
+            then all of the data is presented.
+        </p>
+    </div>
+</div>
+<br>
+</body>
+<script>
+var editContent = document.getElementById("editContent");
+    let custLabel = document.createElement("label")
+    custLabel.innerText = "Customers:"
+    editContent.appendChild(custLabel)
+    let selectCustomer = document.createElement("select");
+    selectCustomer.id = "selectCustomer"
+    editContent.appendChild(selectCustomer)
+    customers().then(allCustomers =>{
+    let option = document.createElement("option");
+	option.text = `Choose Customer`
+	option.value = ``
+	selectCustomer.add(option);
+    allCustomers.forEach(customer => {
+    let option = document.createElement("option");
+	option.text = `${customer.firstname} ${customer.lastname}`
+	option.value = `${customer.customerID}`
+	selectCustomer.add(option);
+    }) })
+
+    editContent.appendChild(document.createElement("br"))
+
+    let prodLabel = document.createElement("label")
+    prodLabel.innerText = "Products:"
+    editContent.appendChild(prodLabel)
+    let selectProduct = document.createElement("select");
+    selectProduct.id = "selectProduct"
+    editContent.appendChild(selectProduct)
+    products().then(allProducts =>{
+    let option = document.createElement("option");
+	option.text = `Choose Product`
+	option.value = ``
+	selectProduct.add(option);
+    allProducts.forEach(prod => {
+    let option = document.createElement("option");
+	option.text = `${prod.name}`
+	option.value = `${prod.productID}`
+	selectProduct.add(option);
+    }) })
+
+    editContent.appendChild(document.createElement("br"))
+
+    let dateLabel = document.createElement("label")
+    dateLabel.innerText = "Date:"
+    editContent.appendChild(dateLabel)
+    let dateInput = document.createElement("input")
+    dateInput.type = "date"
+    dateInput.id = "selectDate"
+    editContent.appendChild(dateInput)
+
+    editContent.appendChild(document.createElement("br"))
+
+    let searchButton = document.createElement("input")
+    searchButton.type = "button"
+    searchButton.value = "Search"
+    searchButton.onclick = () => {purchasesGenerator()}
+    editContent.appendChild(searchButton)
+
+    editContent.appendChild(document.createElement("br"))
+
+    async function purchasesGenerator()
+    {
+        if (document.getElementById("contentBox"))
+        {
+            document.getElementById("contentBox").remove()
+        }
+
+        let custID = document.getElementById("selectCustomer")
+    	let custIDvalue = custID.options[custID.selectedIndex].value;
+        let prodID = document.getElementById("selectProduct")
+    	let prodIDvalue = prodID.options[prodID.selectedIndex].value;
+        let dateVal = document.getElementById("selectDate").value
+        
+        search({ customerID : custIDvalue, productID : prodIDvalue, date : dateVal }).then(data=>
+        {
+            let buildFromHere = document.getElementById("gridContainer")
+            let contentBox = document.createElement("div")
+            contentBox.id = "contentBox"
+            buildFromHere.appendChild(contentBox)
+            
+            console.log(data)
+            if(data.length)
+            {
+                let mainTable = document.createElement("table")
+                mainTable.id = "mainTable"
+                let tXt = document.createElement("h5")
+                tXt.style.textAlign = "center"
+                tXt.innerText = "Results:"
+                contentBox.appendChild(tXt)
+                contentBox.appendChild(mainTable)
+                setTable("Customers", "Products", "Dates")
+            
+                    data.forEach(deal=>{
+                        let tr = document.createElement("tr")
+                        mainTable.appendChild(tr)
+                        let tdCustomer = document.createElement("td")
+                        tdCustomer.innerText = `${deal.firstname} ${deal.lastname}`
+                        tr.appendChild(tdCustomer)
+
+                        let tdProduct = document.createElement("td")
+                        tdProduct.innerText = `${deal.name}`
+                        tr.appendChild(tdProduct)
+
+                        let tdDate = document.createElement("td")
+                        tdDate.innerText = `${deal.date}`
+                        tr.appendChild(tdDate)
+                    })
+            }
+            else
+            {
+                let tXt = document.createElement("h4")
+                tXt.style.textAlign = "center"
+                tXt.innerText = `Oops. 
+                No data
+                
+                Please try a diffrent query`
+                contentBox.appendChild(tXt)            }
+            
+
+        }) //end of search function
+    } //end of purchasesGenerator function
+
+</script>
+</html>

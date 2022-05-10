@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chieftain</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="header">
+
+        <img src="CHIEFTAIN.svg" id="logo">
+    </div>
+    <div id="loginBox">
+    <label>User Name:</label>
+    <input type="text" placeholder="username" id="userName"><br>
+    <label>Password:</label>
+    <input type="password" placeholder="password" id="userPassword"><br>
+
+    <input type="button" value="Login" id="loginButton" onclick="login()"><br>
+    <span id="status"></span>
+</div>
+
+</body>
+<script>
+async function login() 
+{
+    document.getElementById("status").innerText = "";
+    
+    let userName = document.getElementById("userName").value;
+    let userPassword = document.getElementById("userPassword").value;
+    //post Ajax request to server:
+    let obj = { username : userName , password : userPassword };
+    let fetchParams = {  
+                        method : "POST",
+                        body : JSON.stringify(obj),
+                        headers : {"Content-type"  :"application/json" }
+                    }
+    let resp = await fetch("http://127.0.0.1:5000/login", fetchParams);
+    let status = await resp.json();
+    if (status.token) 
+    {   
+        localStorage.removeItem("token");
+        localStorage.setItem("token", `${status.token}`);
+        window.location.href = "products.html" 
+    }
+    else 
+    { 
+        document.getElementById("status").innerText = `Login attempt failed
+        Please check your spelling.`;
+    }
+}
+</script>
+</html>
